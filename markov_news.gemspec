@@ -11,9 +11,9 @@ Gem::Specification.new do |s|
   s.email       = ["support@omniref.com"]
   s.homepage    = "https://www.omniref.com/ruby/gems/markov_news"
   s.summary     = "Hacker news titles generated from markov chains."
-  s.description = "Creates markov chains for hacker news articles by reading all existing hacker news posts."
+  s.description = "Creates blog post titles from markov chains built from all the submissions to hacker news."
   s.license     = "MIT"
 
-  s.files = Dir["lib/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
+  s.files = Dir["lib/**/*", "data/titles.yaml", "MIT-LICENSE", "Rakefile", "README.md"]
   s.test_files = Dir["test/**/*"]
 end

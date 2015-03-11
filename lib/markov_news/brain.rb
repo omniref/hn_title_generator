@@ -22,7 +22,7 @@ module MarkovNews
     # @param [Integer] min_length specifies the lower bound on random sentence length. The sentence may be shorter than this if a punctuation character is encountered.
     # @param [Integer] max_length specifies the upper bound on random sentence length
     # @return [String] a complete sentence according to the markov model
-    def complete_sentence(sentence: '', min_length: 15, max_length: 30)
+    def complete_sentence(sentence = '', min_length: 15, max_length: 30)
       tokens = tokenize(sentence)
       word_count = min_length + rand(min_length - max_length) - tokens.length
       word_count.times do

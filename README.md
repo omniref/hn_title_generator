@@ -1,17 +1,24 @@
-# StreamSampler - a gem to add stream sampling to Ruby classes.
+# MarkovNews - a gem to generate post titiles from Hacker News using Markov Chains.
 
-This gem adds stream sampling (aka reservoir sampling) to Ruby. To use,
-add the gem to your Gemfile (or require it explicitly), and call the
-`StreamSampler.reservoir_sample` method:
+This gem consists of 2 parts. A thin wrapper for the HackerNews API to download
+all the post data: `MarkovNews::Item` and a Markov Model that will be trained on
+the downloaded data: `MarkovNews::Brain`.
 
-    require 'stream_sampler`
-    # takes a 10 item sample from a stream of items:
-    items = (1..1000).to_a
-    StreamSampler.reservoir_sample(items, 10)
+Get your own copy of the hacker news database with:
 
-As a special case, if ActiveRecord and ActiveSupport are defined, the stream
-sampling methods will be added as class methods on `ActiveRecord::Base`, so you
-can do things like this:
+```ruby
+require 'markov_news'
+MarkovNews::Item.sync
+# Wait days for that to finish, or hit CTRL-C when you feel like you've got 
+# enough data to make that interesting.
+```
 
-    require 'stream_sampler'
-    User.where(age: (18..65)).reservoir_sample(10)
+Then create a new brain that can complete your sentence for the most probable
+title on hacker news.
+
+```ruby
+require 'markov_news'
+brain = MarkovNews::Brain.new
+brain.complete_sentence #=> "sergio ramos ruled out for the go gopher – the big bang bundle with $14,863 worth of side projects with new technologies by reflecting light in 15 years of" 
+brain.complete_sentence("Show HN:") #=> "show hn: shoot missiles at ruby devs" 
+```

@@ -7,8 +7,8 @@
 # Ignore bundler config.
 /.bundle
 
-# Ignore all logfiles and tempfiles.
-/data
+# Ignore all item files... there a gigs of them
+/data/item
 
 # Ignore mac osx crap
 .DS_Store
