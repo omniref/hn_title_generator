@@ -19,16 +19,22 @@ module MarkovNews
     # Completes a sentence using the Markov Model trained on news titles.
     #
     # @param [String] sentence to be completed, empty string is acceptable
-    # @param [Integer] min_length specifies the lower bound on random sentence length. The sentence may be shorter than this if a punctuation character is encountered.
-    # @param [Integer] max_length specifies the upper bound on random sentence length
+    # @param [Integer] min_length specifies the lower bound on random sentence
+    # length. The sentence may be shorter than this if a punctuation character
+    # is encountered.
+    # @param [Integer] max_length specifies the upper bound on random sentence
+    # length
     # @return [String] a complete sentence according to the markov model
-    def complete_sentence(sentence = '', min_length: 15, max_length: 30)
+    def complete_sentence(sentence = '', min_length: 5, max_length: 20)
       tokens = tokenize(sentence)
-      word_count = min_length + rand(min_length - max_length) - tokens.length
+      word_count = max_length - tokens.length
       word_count.times do
         markov_state = [tokens[-2], tokens[-1]]
         tokens << @markov_model[markov_state].sample
-        break if tokens[-1].nil? || tokens[-1] =~ /[!?\.]\z/
+
+        break if tokens.length >= min_length && (
+          tokens[-1] =~ /[!?\.]\z/ || tokens[-1].nil?
+        )
       end
       tokens.join(' ').strip
     end
