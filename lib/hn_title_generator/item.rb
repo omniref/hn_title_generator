@@ -1,6 +1,7 @@
 module HNTitleGenerator
   class Item
     require 'open-uri'
+    require 'timeout'    
     require 'fileutils'
     require 'json'
 
@@ -28,8 +29,7 @@ module HNTitleGenerator
       @max_id
     end
 
-    def self.sync(thread_count = 1, item_count = nil)
-      item_count = max_id if item_count.nil?
+    def self.sync(thread_count = 1)
       threads = []
 
       trap("INT") do
@@ -39,11 +39,9 @@ module HNTitleGenerator
       thread_count.times do |i|
         threads << Thread.new do
           id = max_id
-          while id > 0 && item_count > 0
+          while id > 0
             if id % thread_count == i
-              printf "%2i: checking %10i\n", i, id
-              Item.new(id).save(false)
-              item_count -= 1
+              Item.new(id).save(false) rescue nil
             end
             id -= 1
           end
@@ -90,10 +88,7 @@ module HNTitleGenerator
     # Persistence                                                              #
     ############################################################################
     def save(overwrite = true)
-      if !File.exist?(path) || overwrite
-        printf "  : saving %10i\n", id
-        File.write(path, json.to_json)
-      end
+      File.write(path, json.to_json) if !File.exist?(path) || overwrite
       self
     end
 
@@ -101,7 +96,9 @@ module HNTitleGenerator
       if File.exist?(path) && !download
         @json = JSON.load(File.read(path))
       else
-        @json = JSON.load(open(api_url).read) 
+        Timeout.timeout(10) do
+          @json = JSON.load(open(api_url).read) 
+        end
       end
       @json = {} if @json.nil?
       self
