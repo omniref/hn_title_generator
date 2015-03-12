@@ -2,7 +2,7 @@
 
 This gem consists of 2 parts. A thin wrapper for the HackerNews API to download
 all the post data: `HNTitleGenerator::Item` and a Markov Model that will be trained on
-the downloaded data: `HNTitleGenerator::Brain`.
+the downloaded data: `HNTitleGenerator::MarkovModel`.
 
 Get your own copy of the hacker news database with:
 
