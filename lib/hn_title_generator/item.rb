@@ -41,6 +41,7 @@ module HNTitleGenerator
           id = max_id
           while id > 0
             if id % thread_count == i
+              printf "%2i: %i\n", i, id
               Item.new(id).save(false) rescue nil
             end
             id -= 1

@@ -1,11 +1,15 @@
 module HNTitleGenerator
+
+  ##
+  # A model to represent all Hacker News titles, and generate sentences using
+  # markov chains.
   class MarkovModel
     ##
-    # Creates the ultimate buzzword brain using markov chains trained on the
+    # Creates the ultimate buzzword generator using markov chains trained on the
     # titles found in MarkovNews::Item.titles.
     def initialize
       @markov_model = Hash.new { |hash, key| hash[key] = [] }
-      
+
       Item.each_title do |title|
         tokens = tokenize(title)
         until tokens.empty?
@@ -21,10 +25,10 @@ module HNTitleGenerator
     #
     # @param [String] sentence to be completed, empty string is acceptable
     # @param [Integer] min_length specifies the lower bound on random sentence
-    # length. The sentence may be shorter than this if a punctuation character
-    # is encountered.
+    #   length. The sentence may be shorter than this if a punctuation character
+    #   is encountered.
     # @param [Integer] max_length specifies the upper bound on random sentence
-    # length
+    #   length
     # @return [String] a complete sentence according to the markov model
     def complete_sentence(sentence = '', min_length: 5, max_length: 20)
       tokens = tokenize(sentence)
@@ -47,7 +51,7 @@ module HNTitleGenerator
 
         sentence.split(' ').map { |word| word.downcase.to_sym }
       end
-    
+
       ##
       # Checks a token list to see if it forms a proper complete sentence
       #

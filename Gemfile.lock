@@ -1,18 +1,14 @@
 PATH
   remote: .
   specs:
-    markov_news (0.1.0)
-      marky_markov
+    hn_title_generator (0.1.0)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    marky_markov (0.3.5)
-      msgpack
-    msgpack (0.5.11)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
-  markov_news!
+  hn_title_generator!

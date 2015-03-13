@@ -1,4 +1,4 @@
-# HN Title Generator - a gem to generate post titiles from Hacker News using Markov Chains.
+# HN Title Generator - a gem to generate post titles from Hacker News using Markov Chains.
 
 This gem consists of 2 parts. A thin wrapper for the HackerNews API to download
 all the post data: `HNTitleGenerator::Item` and a Markov Model that will be trained on
