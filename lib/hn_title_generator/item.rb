@@ -65,6 +65,7 @@ module HNTitleGenerator
     end
     
     def self.each_title(cached = true)
+      `gunzip -c #{TITLES_PATH}.gz > #{TITLES_PATH}` if File.exist?("#{TITLES_PATH}.gz") && !File.exist?(TITLES_PATH)
       if File.exist?(TITLES_PATH) && cached
         IO.foreach(TITLES_PATH) { |line| yield line }
       else
