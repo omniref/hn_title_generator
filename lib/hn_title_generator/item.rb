@@ -1,20 +1,23 @@
 module HNTitleGenerator
   class Item
     require 'open-uri'
-    require 'timeout'    
+    require 'timeout'
     require 'fileutils'
     require 'json'
+    require 'csv'
 
     include Enumerable
     include Comparable
-    
 
     DATA_PATH = 'data'
     ITEMS_PATH = File.join DATA_PATH, 'item'
-    TITLES_PATH = File.join DATA_PATH, 'titles.txt'
+    STORIES_PATH = File.join DATA_PATH, 'stories.csv'
     API_URL = "https://hacker-news.firebaseio.com/v0"
     FileUtils.mkdir_p ITEMS_PATH
 
+    if File.exist?("#{STORIES_PATH}.gz") && !File.exist?(STORIES_PATH)
+      `gunzip -c #{STORIES_PATH}.gz > #{STORIES_PATH}`
+    end
 
     attr_accessor :id, :json
 
@@ -58,24 +61,31 @@ module HNTitleGenerator
       end
     end
 
-    def self.each_story
-      each do |item|
-        yield item if item.type == 'story'
+    def self.each_story(cached = true)
+      if File.exist?(STORIES_PATH) && cached
+        CSV.foreach(STORIES_PATH, headers: :first_row, converters: :numeric) do |row|
+          yield Item.from_csv(row)
+        end
+      else
+        stories = CSV.open(STORIES_PATH, 'w', headers: true)
+        stories << csv_headers
+        each do |item|
+          next unless item.type == 'story'
+          yield item
+          stories << item.to_csv
+        end
+        stories.close
       end
     end
-    
+
     def self.each_title(cached = true)
-      `gunzip -c #{TITLES_PATH}.gz > #{TITLES_PATH}` if File.exist?("#{TITLES_PATH}.gz") && !File.exist?(TITLES_PATH)
-      if File.exist?(TITLES_PATH) && cached
-        IO.foreach(TITLES_PATH) { |line| yield line }
-      else
-        titles = File.open(TITLES_PATH, 'w')
-        each_story do |story|
-          yield story.title
-          titles.write(story.title.to_s + $/)
-        end
-        titles.close
+      each_story(cached) do |story|
+        yield story.title.to_s
       end
+    end
+
+    def self.csv_headers
+      %w(id by score time title text type url parent)
     end
 
     ############################################################################
@@ -84,6 +94,12 @@ module HNTitleGenerator
     def initialize(id)
       @id = id.to_i
       @json = nil
+    end
+
+    def self.from_csv(row)
+      instance = new(row['id'])
+      instance.instance_variable_set('@json', row)
+      instance
     end
 
     ############################################################################
@@ -99,7 +115,7 @@ module HNTitleGenerator
         @json = JSON.load(File.read(path))
       else
         Timeout.timeout(10) do
-          @json = JSON.load(open(api_url).read) 
+          @json = JSON.load(open(api_url).read)
         end
       end
       @json = {} if @json.nil?
@@ -133,12 +149,15 @@ module HNTitleGenerator
       class_eval("def #{attr}; json['#{attr}']; end", __FILE__, __LINE__)
     end
 
+    def to_csv
+      CSV::Row.new(Item.csv_headers, Item.csv_headers.map { |a| send(a) })
+    end
 
     # Comparable
     def <=>(other)
       id <=> other.id
     end
-    
+
     ############################################################################
     # Private                                                                  #
     ############################################################################
