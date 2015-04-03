@@ -80,7 +80,7 @@ module HNTitleGenerator
       end
 
       def agency?(title)
-        title =~ /CIA|FAA|FBI|FCC|FDA|NSA/
+        title =~ /CIA|FAA|FBI|FCC|FDA|NSA/i
       end
 
       def space?(title)
@@ -116,7 +116,7 @@ module HNTitleGenerator
       end
 
       def list?(title)
-        title =~ /\d+ (ways|things|steps|tips|tricks)/
+        title =~ /\d+ (ways|things|steps|tips|tricks)/i
       end
   end
 end
